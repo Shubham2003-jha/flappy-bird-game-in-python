@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------------
+def getrandompipe():
+    pipeheight=GAME_SPRITES['pipe'][0].get_height()
+    offset=SCREENHEIGHT/3
+    pipex=SCREENWIDTH+10
+    y2=offset+random.randrange(0,SCREENHEIGHT-basex-1.2*offset)
+    y1=pipeheight-y2+offset
+    lst=[{'x':pipex,'y':-y1},{'x':pipex,'y':y2}]
+    return lst
+
+#---------------------------------------------------------------------
+def iscollide(playerx, playery, upperPipes, lowerPipes):
+    if playery> GROUND - 25  or playery<0:
+        GAME_SOUNDS['hit'].play()
+        return True
+    
+    for pipe in upperPipes:
+        pipeHeight = GAME_SPRITES['pipe'][0].get_height()
+        if playery < pipeHeight + pipe['y'] and abs(playerx - pipe['x']) < (int(GAME_SPRITES['pipe'][0].get_width())+int(GAME_SPRITES['player'].get_width()))/2:
+            GAME_SOUNDS['hit'].play()
+            return True
+
+    for pipe in lowerPipes:
+        if (playery + GAME_SPRITES['player'].get_height() > pipe['y']) and abs(playerx - pipe['x']) < (int(GAME_SPRITES['pipe'][0].get_width())+int(GAME_SPRITES['player'].get_width()))/2:
+            GAME_SOUNDS['hit'].play()
+            return True
+
+    return False
