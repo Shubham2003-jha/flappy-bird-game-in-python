@@ -26,3 +26,104 @@ def iscollide(playerx, playery, upperPipes, lowerPipes):
             return True
 
     return False
+ def maingame():
+    score=0
+    playerx=SCREENWIDTH/5
+    playery=SCREENHEIGHT/2
+    basex=0
+    newpipe1=getrandompipe()
+    newpipe2=getrandompipe()
+    upperpipes=[{'x':SCREENWIDTH+200,'y':newpipe1[0]['y']},
+                {'x':1.5*SCREENWIDTH+200,'y':newpipe2[0]['y']}]
+    lowerpipes=[{'x':SCREENWIDTH+200,'y':newpipe1[1]['y']},
+                {'x':1.5*SCREENWIDTH+200,'y':newpipe2[1]['y']}]
+    pipevelx=-4
+    flappyvely=-9
+    maxv=10
+    minv=-8
+    flappyacc=1
+    playerflapv=-8
+    isflapped=False
+    
+
+    while(True):
+        for event in pygame.event.get():
+            if event.type==QUIT or (event.type==KEYDOWN and event.key==K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type==KEYDOWN and (event.key==K_SPACE or event.key==K_UP):
+                if playery>0:
+                    flappyvely=playerflapv
+                    isflapped=True
+                    GAME_SOUNDS['wing'].play()
+        crashtest=iscollide(playerx,playery,upperpipes,lowerpipes)
+        if crashtest:
+            return
+        playermidpos=playerx+GAME_SPRITES['player'].get_width()/2
+        for pipe in upperpipes:
+            pipemidpos=pipe['x']+GAME_SPRITES['pipe'][0].get_width()/2
+            if pipemidpos<=playermidpos<pipemidpos+4:
+                score+=1
+                print("your score is ",score)
+                GAME_SOUNDS['point'].play()
+
+
+        if flappyvely<maxv and not isflapped:
+            flappyvely+=flappyacc
+        
+        if isflapped:
+            isflapped=False
+        
+        playerHeight = GAME_SPRITES['player'].get_height()
+        playery = playery + min(flappyvely, GROUND - playery - playerHeight)
+
+        for upperPipe , lowerPipe in zip(upperpipes, lowerpipes):
+            upperPipe['x'] += pipevelx
+            lowerPipe['x'] += pipevelx
+        
+
+        if 0<upperpipes[0]['x']<5:
+            newpipe = getrandompipe()
+            upperpipes.append(newpipe[0])
+            lowerpipes.append(newpipe[1])
+
+        if upperpipes[0]['x'] < -GAME_SPRITES['pipe'][0].get_width():
+            upperpipes.pop(0)
+            lowerpipes.pop(0)
+        
+        screen.blit(GAME_SPRITES['background'], (0, 0))
+        for upperPipe, lowerPipe in zip(upperpipes, lowerpipes):
+            screen.blit(GAME_SPRITES['pipe'][0], (upperPipe['x'], upperPipe['y']))
+            screen.blit(GAME_SPRITES['pipe'][1], (lowerPipe['x'], lowerPipe['y']))
+
+        screen.blit(GAME_SPRITES['base'], (basex, GROUND))
+        screen.blit(GAME_SPRITES['player'], (playerx, playery))
+        myDigits = [int(x) for x in list(str(score))]
+        width = 0
+        for digit in myDigits:
+            width += GAME_SPRITES['numbers'][digit].get_width()
+        Xoffset = (SCREENWIDTH - width)/2
+
+        for digit in myDigits:
+            screen.blit(GAME_SPRITES['numbers'][digit], (Xoffset, SCREENHEIGHT*0.12))
+            Xoffset += GAME_SPRITES['numbers'][digit].get_width()
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+        
+
+        
+
+
+        
+
+            
+
+
+
+        pass
+    
+    
+
+    
+    
+
